@@ -1,3 +1,19 @@
+/*
+ *    Copyright 2020 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package io.github.shallowinggg.spiral.spring;
 
 import com.alibaba.dubbo.common.Constants;
@@ -30,12 +46,12 @@ import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 /**
  * {@link BeanPostProcessor} implementation used to record the load balance for dubbo reference interfaces.
  * <p>
- * When spring context refreshed successfully, the records will be set into system property with
- * the key {@link SpiralConstant#LB_FALLBACK_PROPERTY}. The representation for record is
+ * When spring context refreshed successfully, the records will be set into system property with the key
+ * {@link SpiralConstant#LB_FALLBACK_PROPERTY}. The representation for record is
  * {@code <interface_name1>:<load_balance_name1>,<interface_name2>:<load_balance_name2>,...}.
  * <p>
- * This records is used by {@link io.github.shallowinggg.spiral.loadbalance.SpiralLoadBalance}. See it
- * for more information.
+ * This records is used by {@link io.github.shallowinggg.spiral.loadbalance.SpiralLoadBalance}. See it for more
+ * information.
  * <p>
  * Note: method level configuration for load balance is not supported.
  *
@@ -45,14 +61,15 @@ import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 public class ReferenceConfigBeanPostProcessor
         implements MergedBeanDefinitionPostProcessor, ApplicationListener<ContextRefreshedEvent>, PriorityOrdered {
 
-    private final StringBuffer lbFallbackBuilder = new StringBuffer();
+    private final StringBuilder lbFallbackBuilder = new StringBuilder();
 
     private final Set<String> handledBean = new ConcurrentHashSet<>(256);
 
     @Override
     public int getOrder() {
-        // this order need to be higher than com.alibaba.dubbo.config.spring.beans.factory.annotation.ReferenceAnnotationBeanPostProcessor
-        // luckily, its order is the lowest until now.
+        // this order need to be higher than
+        // com.alibaba.dubbo.config.spring.beans.factory.annotation.ReferenceAnnotationBeanPostProcessor.
+        // Luckily, its order is the lowest now.
         return 0;
     }
 
@@ -98,8 +115,8 @@ public class ReferenceConfigBeanPostProcessor
     }
 
     /**
-     * Find annotated {@link Reference @Reference} fields and use {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME}
-     * to override its original load balance setting.
+     * Find annotated {@link Reference @Reference} fields and use {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME} to
+     * override its original load balance setting.
      *
      * @param beanClass The {@link Class} of Bean
      */
@@ -125,8 +142,8 @@ public class ReferenceConfigBeanPostProcessor
     }
 
     /**
-     * Find annotated {@link Reference @Reference} methods and use {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME}
-     * to override its original load balance setting.
+     * Find annotated {@link Reference @Reference} methods and use {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME} to
+     * override its original load balance setting.
      *
      * @param beanClass The {@link Class} of Bean
      */
