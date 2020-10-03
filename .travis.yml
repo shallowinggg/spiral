@@ -8,4 +8,5 @@ cache:
     - $HOME/.m2
 
 script:
+  - chmod +x ./mvnw
   - ./mvnw clean verify
