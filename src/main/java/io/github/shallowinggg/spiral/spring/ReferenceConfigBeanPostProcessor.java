@@ -1,5 +1,5 @@
 /*
- *    Copyright 2020 the original author or authors.
+ *    Copyright © 2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,135 +44,141 @@ import static org.springframework.core.annotation.AnnotationUtils.findAnnotation
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 /**
- * {@link BeanPostProcessor} implementation used to record the load balance for dubbo reference interfaces.
+ * {@link BeanPostProcessor} implementation used to record the load balance for dubbo
+ * reference interfaces.
  * <p>
- * When spring context refreshed successfully, the records will be set into system property with the key
- * {@link SpiralConstant#LB_FALLBACK_PROPERTY}. The representation for record is
+ * When spring context refreshed successfully, the records will be set into system
+ * property with the key {@link SpiralConstant#LB_FALLBACK_PROPERTY}. The representation
+ * for record is
  * {@code <interface_name1>:<load_balance_name1>,<interface_name2>:<load_balance_name2>,...}.
  * <p>
- * This records is used by {@link io.github.shallowinggg.spiral.loadbalance.SpiralLoadBalance}. See it for more
+ * This records is used by
+ * {@link io.github.shallowinggg.spiral.loadbalance.SpiralLoadBalance}. See it for more
  * information.
  * <p>
  * Note: method level configuration for load balance is not supported.
  *
  * @author ding shimin
  * @see io.github.shallowinggg.spiral.loadbalance.SpiralLoadBalance
+ * @since 0.1
  */
 public class ReferenceConfigBeanPostProcessor
-        implements MergedBeanDefinitionPostProcessor, ApplicationListener<ContextRefreshedEvent>, PriorityOrdered {
+		implements MergedBeanDefinitionPostProcessor, ApplicationListener<ContextRefreshedEvent>, PriorityOrdered {
 
-    private final StringBuilder lbFallbackBuilder = new StringBuilder();
+	private final StringBuilder lbFallbackBuilder = new StringBuilder();
 
-    private final Set<String> handledBean = new ConcurrentHashSet<>(256);
+	private final Set<String> handledBean = new ConcurrentHashSet<>(256);
 
-    @Override
-    public int getOrder() {
-        // this order need to be higher than
-        // com.alibaba.dubbo.config.spring.beans.factory.annotation.ReferenceAnnotationBeanPostProcessor.
-        // Luckily, its order is the lowest now.
-        return 0;
-    }
+	@Override
+	public int getOrder() {
+		// this order need to be higher than
+		// com.alibaba.dubbo.config.spring.beans.factory.annotation.ReferenceAnnotationBeanPostProcessor.
+		// Luckily, its order is the lowest now.
+		return 0;
+	}
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        // remove the last unnecessary comma
-        if (lbFallbackBuilder.length() > 0) {
-            lbFallbackBuilder.setLength(lbFallbackBuilder.length() - 1);
-        }
-        System.setProperty(SpiralConstant.LB_FALLBACK_PROPERTY, lbFallbackBuilder.toString());
-        // clear
-        lbFallbackBuilder.setLength(0);
-    }
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+		// remove the last unnecessary comma
+		if (lbFallbackBuilder.length() > 0) {
+			lbFallbackBuilder.setLength(lbFallbackBuilder.length() - 1);
+		}
+		System.setProperty(SpiralConstant.LB_FALLBACK_PROPERTY, lbFallbackBuilder.toString());
+		// clear
+		lbFallbackBuilder.setLength(0);
+	}
 
-    @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
+	@Override
+	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		return bean;
+	}
 
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
+	@Override
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		return bean;
+	}
 
-    @Override
-    public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
-        interceptReferenceMetadata(beanName, beanType);
-    }
+	@Override
+	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
+		interceptReferenceMetadata(beanName, beanType);
+	}
 
-    private void interceptReferenceMetadata(String beanName, Class<?> clazz) {
-        // Fall back to class name as cache key, for backwards compatibility with custom callers.
-        String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
-        // Quick check on the concurrent map first, with minimal locking.
-        if (!handledBean.contains(cacheKey)) {
-            synchronized (handledBean) {
-                if (!handledBean.contains(cacheKey)) {
-                    interceptFieldReferenceMetadata(clazz);
-                    interceptMethodReferenceMetadata(clazz);
-                    handledBean.add(cacheKey);
-                }
-            }
-        }
-    }
+	private void interceptReferenceMetadata(String beanName, Class<?> clazz) {
+		// Fall back to class name as cache key, for backwards compatibility with custom
+		// callers.
+		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
+		// Quick check on the concurrent map first, with minimal locking.
+		if (!handledBean.contains(cacheKey)) {
+			synchronized (handledBean) {
+				if (!handledBean.contains(cacheKey)) {
+					interceptFieldReferenceMetadata(clazz);
+					interceptMethodReferenceMetadata(clazz);
+					handledBean.add(cacheKey);
+				}
+			}
+		}
+	}
 
-    /**
-     * Find annotated {@link Reference @Reference} fields and use {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME} to
-     * override its original load balance setting.
-     *
-     * @param beanClass The {@link Class} of Bean
-     */
-    private void interceptFieldReferenceMetadata(final Class<?> beanClass) {
-        ReflectionUtils.doWithFields(beanClass, field -> {
-            Reference reference = getAnnotation(field, Reference.class);
-            if (reference != null) {
-                if (Modifier.isStatic(field.getModifiers())) {
-                    return;
-                }
+	/**
+	 * Find annotated {@link Reference @Reference} fields and use
+	 * {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME} to override its original load
+	 * balance setting.
+	 * @param beanClass The {@link Class} of Bean
+	 */
+	private void interceptFieldReferenceMetadata(final Class<?> beanClass) {
+		ReflectionUtils.doWithFields(beanClass, field -> {
+			Reference reference = getAnnotation(field, Reference.class);
+			if (reference != null) {
+				if (Modifier.isStatic(field.getModifiers())) {
+					return;
+				}
 
-                String lbName = reference.loadbalance();
-                String beanClassName = beanClass.getName();
-                String interfaceName = field.getType().getName();
-                String entry = beanClassName + "#" + interfaceName + ":" + lbName + ",";
-                lbFallbackBuilder.append(entry);
-                // use spiral load balance instead
-                SpiralReflectionUtils.setAnnotationMember(reference, Constants.LOADBALANCE_KEY,
-                        SpiralConstant.SPIRAL_LOAD_BALANCE_NAME);
-            }
-        });
+				String lbName = reference.loadbalance();
+				String beanClassName = beanClass.getName();
+				String interfaceName = field.getType().getName();
+				String entry = beanClassName + "#" + interfaceName + ":" + lbName + ",";
+				lbFallbackBuilder.append(entry);
+				// use spiral load balance instead
+				SpiralReflectionUtils.setAnnotationMember(reference, Constants.LOADBALANCE_KEY,
+						SpiralConstant.SPIRAL_LOAD_BALANCE_NAME);
+			}
+		});
 
-    }
+	}
 
-    /**
-     * Find annotated {@link Reference @Reference} methods and use {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME} to
-     * override its original load balance setting.
-     *
-     * @param beanClass The {@link Class} of Bean
-     */
-    private void interceptMethodReferenceMetadata(final Class<?> beanClass) {
-        ReflectionUtils.doWithMethods(beanClass, method -> {
-            Method bridgedMethod = findBridgedMethod(method);
-            if (!isVisibilityBridgeMethodPair(method, bridgedMethod)) {
-                return;
-            }
+	/**
+	 * Find annotated {@link Reference @Reference} methods and use
+	 * {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME} to override its original load
+	 * balance setting.
+	 * @param beanClass The {@link Class} of Bean
+	 */
+	private void interceptMethodReferenceMetadata(final Class<?> beanClass) {
+		ReflectionUtils.doWithMethods(beanClass, method -> {
+			Method bridgedMethod = findBridgedMethod(method);
+			if (!isVisibilityBridgeMethodPair(method, bridgedMethod)) {
+				return;
+			}
 
-            Reference reference = findAnnotation(bridgedMethod, Reference.class);
-            if (reference != null && method.equals(ClassUtils.getMostSpecificMethod(method, beanClass))) {
-                if (Modifier.isStatic(method.getModifiers())) {
-                    return;
-                }
+			Reference reference = findAnnotation(bridgedMethod, Reference.class);
+			if (reference != null && method.equals(ClassUtils.getMostSpecificMethod(method, beanClass))) {
+				if (Modifier.isStatic(method.getModifiers())) {
+					return;
+				}
 
-                PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, beanClass);
-                if (pd != null) {
-                    String lbName = reference.loadbalance();
-                    String beanClassName = beanClass.getName();
-                    String interfaceName = pd.getPropertyType().getName();
-                    String entry = beanClassName + "#" + interfaceName + ":" + lbName + ",";
-                    lbFallbackBuilder.append(entry);
-                    // use spiral load balance instead
-                    SpiralReflectionUtils.setAnnotationMember(reference, Constants.LOADBALANCE_KEY,
-                            SpiralConstant.SPIRAL_LOAD_BALANCE_NAME);
-                }
-            }
-        });
+				PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, beanClass);
+				if (pd != null) {
+					String lbName = reference.loadbalance();
+					String beanClassName = beanClass.getName();
+					String interfaceName = pd.getPropertyType().getName();
+					String entry = beanClassName + "#" + interfaceName + ":" + lbName + ",";
+					lbFallbackBuilder.append(entry);
+					// use spiral load balance instead
+					SpiralReflectionUtils.setAnnotationMember(reference, Constants.LOADBALANCE_KEY,
+							SpiralConstant.SPIRAL_LOAD_BALANCE_NAME);
+				}
+			}
+		});
 
-    }
+	}
+
 }

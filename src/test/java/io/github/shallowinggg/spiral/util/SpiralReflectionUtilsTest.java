@@ -1,5 +1,5 @@
 /*
- *    Copyright 2020 the original author or authors.
+ *    Copyright © 2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,16 +24,18 @@ import org.junit.Test;
  */
 public class SpiralReflectionUtilsTest {
 
-    @Test
-    public void testSetAnnotationValue() {
-        AB annotation = AnnotatedClass.class.getAnnotation(AB.class);
-        Assert.assertNotNull(annotation);
-        Assert.assertEquals("1", annotation.val());
-        SpiralReflectionUtils.setAnnotationMember(annotation, "val", "2");
-        Assert.assertEquals("2", annotation.val());
-    }
+	@Test
+	public void testSetAnnotationValue() {
+		AB annotation = AnnotatedClass.class.getAnnotation(AB.class);
+		Assert.assertNotNull(annotation);
+		Assert.assertEquals("1", annotation.val());
+		SpiralReflectionUtils.setAnnotationMember(annotation, "val", "2");
+		Assert.assertEquals("2", annotation.val());
+	}
 
-    @AB(val = "1")
-    private static class AnnotatedClass {
-    }
+	@AB(val = "1")
+	private static class AnnotatedClass {
+
+	}
+
 }

@@ -1,5 +1,5 @@
 /*
- *    Copyright 2020 the original author or authors.
+ *    Copyright © 2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@ import java.lang.annotation.Target;
  * @author ding shimin
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target({ ElementType.TYPE, ElementType.FIELD })
 public @interface AB {
-    String val();
+
+	String val();
+
 }

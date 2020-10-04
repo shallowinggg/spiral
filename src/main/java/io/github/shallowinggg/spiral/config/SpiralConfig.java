@@ -1,5 +1,5 @@
 /*
- *    Copyright 2020 the original author or authors.
+ *    Copyright © 2020 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,30 +13,33 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package io.github.shallowinggg.spiral.config;
 
 /**
  * @author ding shimin
+ * @since 0.1
  */
 public class SpiralConfig {
 
-    private String tag;
+	private String tag;
 
-    private Boolean enable = Boolean.FALSE;
+	private Boolean enable = Boolean.FALSE;
 
-    public String getTag() {
-        return tag;
-    }
+	public String getTag() {
+		return tag;
+	}
 
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
 
-    public Boolean getEnable() {
-        return enable;
-    }
+	public Boolean getEnable() {
+		return enable;
+	}
 
-    public void setEnable(Boolean enable) {
-        this.enable = enable;
-    }
+	public void setEnable(Boolean enable) {
+		this.enable = enable;
+	}
+
 }
