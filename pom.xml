@@ -47,18 +47,21 @@
 
     <scm>
         <url>https://github.com/shallowinggg/spiral</url>
-        <connection>>scm:git:ssh://github.com/shallowinggg/spiral.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/shallowinggg/spiral.git</developerConnection>
+        <connection>scm:git:https://github.com/shallowinggg/spiral.git</connection>
+        <developerConnection>scm:git:https://github.com/shallowinggg/spiral.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
+    <properties>
+        <dubbo.version>2.2.0</dubbo.version>
+        <jsr305.version>3.0.2</jsr305.version>
+        <spring-context.version>3.2.13.RELEASE</spring-context.version>
+
+        <mockio-core.version>3.5.13</mockio-core.version>
+        <junit.version>4.12</junit.version>
+    </properties>
+
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
 <!-- Add 2.7 compatible in the future -->
 <!--        <dependency>-->
 <!--            <groupId>org.apache.dubbo</groupId>-->
@@ -69,13 +72,13 @@
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
-            <version>3.0.2</version>
+            <version>${jsr305.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>dubbo</artifactId>
-            <version>2.2.0</version>
+            <version>${dubbo.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -87,24 +90,49 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.2.13.RELEASE</version>
+            <version>${spring-context.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-aop</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-expression</artifactId>
-                </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockio-core.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${checkstyle.plugin}</version>
+                <configuration>
+                    <configLocation>${checkstyle.config}</configLocation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

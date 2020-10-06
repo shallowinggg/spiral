@@ -1,17 +1,15 @@
 /*
- *    Copyright © 2020 the original author or authors.
+ * Copyright © 2020 the original author or authors.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package io.github.shallowinggg.spiral.spring;
@@ -32,13 +30,13 @@ import java.util.regex.Pattern;
 /**
  * {@link BeanPostProcessor} implementation used to intercept {@link ApplicationConfig}.
  * <p>
- * Any {@link ApplicationConfig} instance will be modified name (append user specified
- * tag). For example:
+ * Any {@link ApplicationConfig} instance will be modified name (append user specified tag). For
+ * example:
  *
  * <pre>
  * origin application name: demo-provider
  * tag: red
- * ==>
+ *
  * enhanced application name: demo-provider-red
  * </pre>
  *
@@ -63,19 +61,22 @@ public class ApplicationConfigBeanPostProcessor implements BeanPostProcessor, En
 	}
 
 	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessBeforeInitialization(Object bean, String beanName)
+			throws BeansException {
 		return bean;
 	}
 
 	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessAfterInitialization(Object bean, String beanName)
+			throws BeansException {
 		if (bean instanceof ApplicationConfig) {
 			ApplicationConfig applicationConfig = (ApplicationConfig) bean;
 			String name = applicationConfig.getName();
 			String enhancedName = name + "-" + tag;
 			applicationConfig.setName(enhancedName);
 			if (log.isDebugEnabled()) {
-				log.debug(String.format("Dubbo application name '%s' is changed to '%s'", name, enhancedName));
+				log.debug(String.format("Dubbo application name '%s' is changed to '%s'", name,
+						enhancedName));
 			}
 		}
 		return bean;
@@ -85,7 +86,7 @@ public class ApplicationConfigBeanPostProcessor implements BeanPostProcessor, En
 		Assert.hasText(tag, "tag must has text");
 		Matcher matcher = PATTERN_NAME.matcher(tag);
 		if (!matcher.matches()) {
-			throw new IllegalStateException("Invalid tag \"" + tag + "\" contains illegal "
+			throw new IllegalArgumentException("Invalid tag \"" + tag + "\" contains illegal "
 					+ "character, only digit, letter, '-', '_' or '.' is legal.");
 		}
 		this.tag = tag;

@@ -1,17 +1,15 @@
 /*
- *    Copyright © 2020 the original author or authors.
+ * Copyright © 2020 the original author or authors.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package io.github.shallowinggg.spiral.spring;
@@ -44,17 +42,15 @@ import static org.springframework.core.annotation.AnnotationUtils.findAnnotation
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 /**
- * {@link BeanPostProcessor} implementation used to record the load balance for dubbo
- * reference interfaces.
+ * {@link BeanPostProcessor} implementation used to record the load balance for dubbo reference
+ * interfaces.
  * <p>
- * When spring context refreshed successfully, the records will be set into system
- * property with the key {@link SpiralConstant#LB_FALLBACK_PROPERTY}. The representation
- * for record is
+ * When spring context refreshed successfully, the records will be set into system property with the
+ * key {@link SpiralConstant#LB_FALLBACK_PROPERTY}. The representation for record is
  * {@code <interface_name1>:<load_balance_name1>,<interface_name2>:<load_balance_name2>,...}.
  * <p>
- * This records is used by
- * {@link io.github.shallowinggg.spiral.loadbalance.SpiralLoadBalance}. See it for more
- * information.
+ * This records is used by {@link io.github.shallowinggg.spiral.loadbalance.SpiralLoadBalance}. See
+ * it for more information.
  * <p>
  * Note: method level configuration for load balance is not supported.
  *
@@ -62,12 +58,12 @@ import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
  * @see io.github.shallowinggg.spiral.loadbalance.SpiralLoadBalance
  * @since 0.1
  */
-public class ReferenceConfigBeanPostProcessor
-		implements MergedBeanDefinitionPostProcessor, ApplicationListener<ContextRefreshedEvent>, PriorityOrdered {
+public class ReferenceConfigBeanPostProcessor implements MergedBeanDefinitionPostProcessor,
+		ApplicationListener<ContextRefreshedEvent>, PriorityOrdered {
 
 	private final StringBuilder lbFallbackBuilder = new StringBuilder();
 
-	private final Set<String> handledBean = new ConcurrentHashSet<>(256);
+	private final Set<String> handledBeans = new ConcurrentHashSet<>(256);
 
 	@Override
 	public int getOrder() {
@@ -89,31 +85,34 @@ public class ReferenceConfigBeanPostProcessor
 	}
 
 	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessBeforeInitialization(Object bean, String beanName)
+			throws BeansException {
 		return bean;
 	}
 
 	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessAfterInitialization(Object bean, String beanName)
+			throws BeansException {
 		return bean;
 	}
 
 	@Override
-	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
+	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition,
+			Class<?> beanType, String beanName) {
 		interceptReferenceMetadata(beanName, beanType);
 	}
 
 	private void interceptReferenceMetadata(String beanName, Class<?> clazz) {
 		// Fall back to class name as cache key, for backwards compatibility with custom
 		// callers.
-		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
+		String cacheKey = StringUtils.hasLength(beanName) ? beanName : clazz.getName();
 		// Quick check on the concurrent map first, with minimal locking.
-		if (!handledBean.contains(cacheKey)) {
-			synchronized (handledBean) {
-				if (!handledBean.contains(cacheKey)) {
+		if (!handledBeans.contains(cacheKey)) {
+			synchronized (handledBeans) {
+				if (!handledBeans.contains(cacheKey)) {
 					interceptFieldReferenceMetadata(clazz);
 					interceptMethodReferenceMetadata(clazz);
-					handledBean.add(cacheKey);
+					handledBeans.add(cacheKey);
 				}
 			}
 		}
@@ -121,8 +120,9 @@ public class ReferenceConfigBeanPostProcessor
 
 	/**
 	 * Find annotated {@link Reference @Reference} fields and use
-	 * {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME} to override its original load
-	 * balance setting.
+	 * {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME} to override its original load balance
+	 * setting.
+	 *
 	 * @param beanClass The {@link Class} of Bean
 	 */
 	private void interceptFieldReferenceMetadata(final Class<?> beanClass) {
@@ -134,6 +134,11 @@ public class ReferenceConfigBeanPostProcessor
 				}
 
 				String lbName = reference.loadbalance();
+				// filter default load balance
+				if ("".equals(lbName)) {
+					return;
+				}
+
 				String beanClassName = beanClass.getName();
 				String interfaceName = field.getType().getName();
 				String entry = beanClassName + "#" + interfaceName + ":" + lbName + ",";
@@ -148,8 +153,9 @@ public class ReferenceConfigBeanPostProcessor
 
 	/**
 	 * Find annotated {@link Reference @Reference} methods and use
-	 * {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME} to override its original load
-	 * balance setting.
+	 * {@link SpiralConstant#SPIRAL_LOAD_BALANCE_NAME} to override its original load balance
+	 * setting.
+	 *
 	 * @param beanClass The {@link Class} of Bean
 	 */
 	private void interceptMethodReferenceMetadata(final Class<?> beanClass) {
@@ -160,7 +166,8 @@ public class ReferenceConfigBeanPostProcessor
 			}
 
 			Reference reference = findAnnotation(bridgedMethod, Reference.class);
-			if (reference != null && method.equals(ClassUtils.getMostSpecificMethod(method, beanClass))) {
+			if (reference != null
+					&& method.equals(ClassUtils.getMostSpecificMethod(method, beanClass))) {
 				if (Modifier.isStatic(method.getModifiers())) {
 					return;
 				}
@@ -168,6 +175,11 @@ public class ReferenceConfigBeanPostProcessor
 				PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, beanClass);
 				if (pd != null) {
 					String lbName = reference.loadbalance();
+					// filter default load balance
+					if ("".equals(lbName)) {
+						return;
+					}
+
 					String beanClassName = beanClass.getName();
 					String interfaceName = pd.getPropertyType().getName();
 					String entry = beanClassName + "#" + interfaceName + ":" + lbName + ",";
