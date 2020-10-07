@@ -17,8 +17,8 @@ package io.github.shallowinggg.spiral.spring;
 import com.alibaba.dubbo.config.annotation.Reference;
 import io.github.shallowinggg.spiral.config.DemoProvider;
 import io.github.shallowinggg.spiral.config.DemoProvider2;
+import io.github.shallowinggg.spiral.config.ReferenceTestConfig;
 import io.github.shallowinggg.spiral.config.SpiralConstant;
-import io.github.shallowinggg.spiral.config.TestConfig;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -44,7 +44,7 @@ public class ReferenceConfigBeanPostProcessorTest {
 
 		Field demoProviderField = ReflectionUtils.findField(ReferenceConfig.class, "demoProvider");
 		Reference reference = AnnotationUtils.getAnnotation(demoProviderField, Reference.class);
-		Assert.assertEquals("", reference.loadbalance());
+		Assert.assertEquals(SpiralConstant.SPIRAL_LOAD_BALANCE_NAME, reference.loadbalance());
 
 		Field demoProvider2Field =
 				ReflectionUtils.findField(ReferenceConfig.class, "demoProvider2");
@@ -58,9 +58,7 @@ public class ReferenceConfigBeanPostProcessorTest {
 		ReferenceConfigBeanPostProcessor postProcessor = new ReferenceConfigBeanPostProcessor();
 		postProcessor.postProcessMergedBeanDefinition(null, ReferenceConfig2.class, "testConfig");
 		postProcessor.onApplicationEvent(new ContextRefreshedEvent(ac));
-		Assert.assertEquals(
-				"io.github.shallowinggg.spiral.spring.ReferenceConfigBeanPostProcessorTest$ReferenceConfig2"
-						+ "#io.github.shallowinggg.spiral.config.DemoProvider2:random",
+		Assert.assertEquals("io.github.shallowinggg.spiral.config.DemoProvider2:random",
 				System.getProperty(SpiralConstant.LB_FALLBACK_PROPERTY));
 	}
 
@@ -68,10 +66,10 @@ public class ReferenceConfigBeanPostProcessorTest {
 	public void testStartWithApplicationContext() {
 		System.setProperty(SpiralConstant.ENABLE_PROPERTY, "on");
 		System.setProperty(SpiralConstant.TAG_PROPERTY, "red");
-		new AnnotationConfigApplicationContext(TestConfig.class);
+		new AnnotationConfigApplicationContext(ReferenceTestConfig.class);
 		Assert.assertEquals(
-				"io.github.shallowinggg.spiral.config.TestConfig$ReferenceContainer"
-						+ "#io.github.shallowinggg.spiral.config.DemoProvider2:random",
+				"io.github.shallowinggg.spiral.config.DemoProvider:roundrobin,"
+						+ "io.github.shallowinggg.spiral.config.DemoProvider2:random",
 				System.getProperty(SpiralConstant.LB_FALLBACK_PROPERTY));
 	}
 

@@ -20,8 +20,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import io.github.shallowinggg.spiral.config.ApplicationTestConfig;
 import io.github.shallowinggg.spiral.config.SpiralConstant;
-import io.github.shallowinggg.spiral.config.TestConfig;
 
 /**
  * @author ding shimin
@@ -48,7 +48,7 @@ public class ApplicationConfigBeanPostProcessorTest {
 		System.setProperty(SpiralConstant.ENABLE_PROPERTY, "on");
 		System.setProperty(SpiralConstant.TAG_PROPERTY, "red");
 		AnnotationConfigApplicationContext ac =
-				new AnnotationConfigApplicationContext(TestConfig.class);
+				new AnnotationConfigApplicationContext(ApplicationTestConfig.class);
 		ApplicationConfig config = ac.getBean(ApplicationConfig.class);
 		Assert.assertEquals("demo-provider-red", config.getName());
 	}

@@ -21,16 +21,14 @@ import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.cluster.LoadBalance;
 import com.alibaba.dubbo.rpc.cluster.loadbalance.AbstractLoadBalance;
+import io.github.shallowinggg.spiral.config.SpiralConstant;
+import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.util.ReflectionUtils;
-
-import io.github.shallowinggg.spiral.config.SpiralConstant;
 
 /**
  * {@link LoadBalance} implementation used to filter tag-based service provider.
@@ -118,7 +116,7 @@ public class SpiralLoadBalance extends AbstractLoadBalance {
 				}
 			}
 		}
-		// no specified provider, use origin
+		// no specified service provider, fallback
 		if (matchedInvokers.isEmpty()) {
 			matchedInvokers = invokers;
 		}

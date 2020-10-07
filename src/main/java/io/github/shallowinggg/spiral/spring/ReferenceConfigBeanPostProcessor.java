@@ -34,7 +34,9 @@ import org.springframework.util.StringUtils;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.springframework.core.BridgeMethodResolver.findBridgedMethod;
 import static org.springframework.core.BridgeMethodResolver.isVisibilityBridgeMethodPair;
@@ -43,7 +45,7 @@ import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 /**
  * {@link BeanPostProcessor} implementation used to record the load balance for dubbo reference
- * interfaces.
+ * interfaces and replace it with spiral load balance.
  * <p>
  * When spring context refreshed successfully, the records will be set into system property with the
  * key {@link SpiralConstant#LB_FALLBACK_PROPERTY}. The representation for record is
@@ -64,6 +66,14 @@ public class ReferenceConfigBeanPostProcessor implements MergedBeanDefinitionPos
 	private final StringBuilder lbFallbackBuilder = new StringBuilder();
 
 	private final Set<String> handledBeans = new ConcurrentHashSet<>(256);
+
+	/**
+	 * Record whether the service interface has been handled. It assumes that for same service
+	 * provider, the {@link Reference} annotation should use the same load balance.
+	 *
+	 * The initial size is 32, for application should not import too many service dependencies.
+	 */
+	private final Map<String, Boolean> handledServiceInterfaces = new ConcurrentHashMap<>(32);
 
 	@Override
 	public int getOrder() {
@@ -133,19 +143,8 @@ public class ReferenceConfigBeanPostProcessor implements MergedBeanDefinitionPos
 					return;
 				}
 
-				String lbName = reference.loadbalance();
-				// filter default load balance
-				if ("".equals(lbName)) {
-					return;
-				}
-
-				String beanClassName = beanClass.getName();
 				String interfaceName = field.getType().getName();
-				String entry = beanClassName + "#" + interfaceName + ":" + lbName + ",";
-				lbFallbackBuilder.append(entry);
-				// use spiral load balance instead
-				SpiralReflectionUtils.setAnnotationMember(reference, Constants.LOADBALANCE_KEY,
-						SpiralConstant.SPIRAL_LOAD_BALANCE_NAME);
+				handleReference(reference, interfaceName);
 			}
 		});
 
@@ -174,23 +173,34 @@ public class ReferenceConfigBeanPostProcessor implements MergedBeanDefinitionPos
 
 				PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, beanClass);
 				if (pd != null) {
-					String lbName = reference.loadbalance();
-					// filter default load balance
-					if ("".equals(lbName)) {
-						return;
-					}
-
-					String beanClassName = beanClass.getName();
 					String interfaceName = pd.getPropertyType().getName();
-					String entry = beanClassName + "#" + interfaceName + ":" + lbName + ",";
-					lbFallbackBuilder.append(entry);
-					// use spiral load balance instead
-					SpiralReflectionUtils.setAnnotationMember(reference, Constants.LOADBALANCE_KEY,
-							SpiralConstant.SPIRAL_LOAD_BALANCE_NAME);
+					handleReference(reference, interfaceName);
 				}
 			}
 		});
 
+	}
+
+	/**
+	 * Record the user specified load balance and replace it with spiral load balance. If use
+	 * default load balance, it won't be recorded for memory cost reduction.
+	 *
+	 * @param reference the {@link Reference} object
+	 * @param serviceInterface the name of service interface
+	 * @see #handledServiceInterfaces
+	 */
+	private void handleReference(Reference reference, String serviceInterface) {
+		Boolean val = handledServiceInterfaces.putIfAbsent(serviceInterface, Boolean.TRUE);
+		String lbName = reference.loadbalance();
+		// filter default load balance
+		if (val == null && !"".equals(lbName)) {
+			String entry = serviceInterface + ":" + lbName + ",";
+			lbFallbackBuilder.append(entry);
+		}
+
+		// use spiral load balance instead
+		SpiralReflectionUtils.setAnnotationMember(reference, Constants.LOADBALANCE_KEY,
+				SpiralConstant.SPIRAL_LOAD_BALANCE_NAME);
 	}
 
 }
