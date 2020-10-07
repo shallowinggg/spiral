@@ -14,11 +14,11 @@
 
 package io.github.shallowinggg.spiral.util;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * Convenient utility methods for system property operations.

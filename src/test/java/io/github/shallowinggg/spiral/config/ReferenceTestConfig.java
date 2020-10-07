@@ -15,11 +15,9 @@
 package io.github.shallowinggg.spiral.config;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-
+import io.github.shallowinggg.spiral.spring.EnableSpiral;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import io.github.shallowinggg.spiral.spring.EnableSpiral;
 
 /**
  * @author ding shimin

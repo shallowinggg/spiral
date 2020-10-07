@@ -15,10 +15,7 @@
 package io.github.shallowinggg.spiral.spring;
 
 import com.alibaba.dubbo.config.ApplicationConfig;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import io.github.shallowinggg.spiral.config.SpiralConstant;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -27,7 +24,8 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
-import io.github.shallowinggg.spiral.config.SpiralConstant;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * {@link BeanPostProcessor} implementation used to intercept {@link ApplicationConfig}.

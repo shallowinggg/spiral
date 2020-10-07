@@ -53,6 +53,8 @@
     </scm>
 
     <properties>
+        <clirr.comparisonVersion>0.1.0</clirr.comparisonVersion>
+
         <dubbo.version>2.2.0</dubbo.version>
         <jsr305.version>3.0.2</jsr305.version>
         <spring-context.version>3.2.13.RELEASE</spring-context.version>

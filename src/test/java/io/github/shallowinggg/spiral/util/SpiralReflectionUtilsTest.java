@@ -14,10 +14,9 @@
 
 package io.github.shallowinggg.spiral.util;
 
+import io.github.shallowinggg.spiral.annotation.AB;
 import org.junit.Assert;
 import org.junit.Test;
-
-import io.github.shallowinggg.spiral.annotation.AB;
 
 /**
  * @author ding shimin

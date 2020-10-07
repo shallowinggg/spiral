@@ -14,13 +14,12 @@
 
 package io.github.shallowinggg.spiral.spring;
 
+import io.github.shallowinggg.spiral.config.SpiralConstant;
+import io.github.shallowinggg.spiral.config.TestConfig;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import io.github.shallowinggg.spiral.config.SpiralConstant;
-import io.github.shallowinggg.spiral.config.TestConfig;
 
 /**
  * @author ding shimin

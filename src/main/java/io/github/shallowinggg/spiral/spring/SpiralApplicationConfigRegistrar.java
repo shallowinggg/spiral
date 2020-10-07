@@ -14,14 +14,13 @@
 
 package io.github.shallowinggg.spiral.spring;
 
+import io.github.shallowinggg.spiral.config.SpiralConstant;
+import io.github.shallowinggg.spiral.util.SystemPropertyUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
-
-import io.github.shallowinggg.spiral.config.SpiralConstant;
-import io.github.shallowinggg.spiral.util.SystemPropertyUtils;
 
 /**
  * {@link ApplicationConfigBeanPostProcessor} bean registrar.

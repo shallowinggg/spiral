@@ -15,13 +15,11 @@
 package io.github.shallowinggg.spiral.spring;
 
 import com.alibaba.dubbo.config.ApplicationConfig;
-
+import io.github.shallowinggg.spiral.config.ApplicationTestConfig;
+import io.github.shallowinggg.spiral.config.SpiralConstant;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import io.github.shallowinggg.spiral.config.ApplicationTestConfig;
-import io.github.shallowinggg.spiral.config.SpiralConstant;
 
 /**
  * @author ding shimin
