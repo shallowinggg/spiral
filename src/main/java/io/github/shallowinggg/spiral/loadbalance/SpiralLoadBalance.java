@@ -54,9 +54,13 @@ public class SpiralLoadBalance extends AbstractLoadBalance {
 
 	/**
 	 * Store the fallback {@link LoadBalance}s for each
-	 * {@link com.alibaba.dubbo.config.annotation.Reference} use. key:
-	 * {bean_class_name}#{provider_interface_name} value:
-	 * {@link com.alibaba.dubbo.config.annotation.Reference#loadbalance()}
+	 * {@link com.alibaba.dubbo.config.annotation.Reference} use.
+	 *
+	 * <pre>
+	 *     key: {provider_interface_name}
+	 *     value: {@link com.alibaba.dubbo.config.annotation.Reference#loadbalance()}
+	 * </pre>
+	 *
 	 */
 	private final Map<String, LoadBalance> fallBackLbs;
 
@@ -77,16 +81,14 @@ public class SpiralLoadBalance extends AbstractLoadBalance {
 				.getExtension(Constants.DEFAULT_LOADBALANCE);
 		Map<String, LoadBalance> fallBackLbs = new HashMap<>();
 		String fallbackLBNames = System.getProperty(SpiralConstant.LB_FALLBACK_PROPERTY);
-		for (String fallBackLB : fallbackLBNames.split(",")) {
-			String[] fallBackLBEntry = fallBackLB.split(":");
-			if (fallBackLBEntry.length == 0) {
-				continue;
-			}
+		if (fallbackLBNames != null && !fallbackLBNames.isEmpty()) {
+			for (String fallBackLB : fallbackLBNames.split(",")) {
+				String[] fallBackLBEntry = fallBackLB.split(":");
+				if (fallBackLBEntry.length != 2) {
+					continue;
+				}
 
-			String interfaceName = fallBackLBEntry[0];
-			if (fallBackLBEntry.length == 1) {
-				fallBackLbs.put(interfaceName, defaultLoadBalance);
-			} else {
+				String interfaceName = fallBackLBEntry[0];
 				String fallbackLBName = fallBackLBEntry[1];
 				fallBackLbs.put(interfaceName, ExtensionLoader.getExtensionLoader(LoadBalance.class)
 						.getExtension(fallbackLBName));
@@ -126,4 +128,7 @@ public class SpiralLoadBalance extends AbstractLoadBalance {
 		return fallback.select(matchedInvokers, url, invocation);
 	}
 
+	/* for test */ Map<String, LoadBalance> getFallBackLbs() {
+		return fallBackLbs;
+	}
 }

@@ -35,6 +35,19 @@ import java.util.List;
 public class SpiralLoadBalanceTest {
 
 	@Test
+	public void testConstruction() {
+		System.setProperty(SpiralConstant.TAG_PROPERTY, "red");
+		System.setProperty(SpiralConstant.LB_FALLBACK_PROPERTY,
+				"io.github.shallowinggg.spiral.config.DemoProvider:roundrobin");
+		SpiralLoadBalance loadBalance = new SpiralLoadBalance();
+		Assert.assertEquals(1, loadBalance.getFallBackLbs().size());
+
+		System.setProperty(SpiralConstant.LB_FALLBACK_PROPERTY, "");
+		loadBalance = new SpiralLoadBalance();
+		Assert.assertEquals(0, loadBalance.getFallBackLbs().size());
+	}
+
+	@Test
 	public void testSelect() {
 		System.setProperty(SpiralConstant.TAG_PROPERTY, "red");
 		System.setProperty(SpiralConstant.LB_FALLBACK_PROPERTY,
