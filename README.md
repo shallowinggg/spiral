@@ -47,7 +47,7 @@ public class XXXConfig {
 
 The `dubbo` service providers and consumers which need to test are all should add this annotation.
 
-### 启动
+### start
 
 Add following system property when started:
 
