@@ -19,16 +19,21 @@ import io.github.shallowinggg.spiral.util.SystemPropertyUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
- * {@link ApplicationConfigBeanPostProcessor} bean registrar.
+ * {@link ApplicationConfigBeanPostProcessor} and {@link ReferenceConfigBeanPostProcessor} bean
+ * registrar. They will only be registered when {@link SpiralConstant#ENABLE_PROPERTY} is set to
+ * {@code true}.
  *
  * @author ding shimin
  * @since 0.1
  */
-public class SpiralApplicationConfigRegistrar implements ImportBeanDefinitionRegistrar {
+public class SpiralApplicationConfigRegistrar
+		implements ImportBeanDefinitionRegistrar, EnvironmentAware {
 
 	private static final String APPLICATION_CONFIG_BEAN_PROCESSOR_NAME =
 			"io.github.shallowinggg.spiral.spring.ApplicationConfigBeanPostProcessor";
@@ -36,10 +41,18 @@ public class SpiralApplicationConfigRegistrar implements ImportBeanDefinitionReg
 	private static final String REFERENCE_CONFIG_BEAN_PROCESSOR_NAME =
 			"io.github.shallowinggg.spiral.spring.ReferenceConfigBeanPostProcessor";
 
+	private Environment environment;
+
+	@Override
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
+	}
+
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata,
 			BeanDefinitionRegistry beanDefinitionRegistry) {
-		if (SystemPropertyUtils.getBoolean(SpiralConstant.ENABLE_PROPERTY, false)) {
+		if (environment.getProperty(SpiralConstant.ENABLE_PROPERTY, Boolean.class, Boolean.FALSE)
+				|| SystemPropertyUtils.getBoolean(SpiralConstant.ENABLE_PROPERTY, false)) {
 			registerApplicationConfigBeanPostProcessor(beanDefinitionRegistry);
 			registerReferenceConfigBeanPostProcessor(beanDefinitionRegistry);
 		}

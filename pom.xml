@@ -53,8 +53,8 @@
         <site>
             <id>gh-pages</id>
             <name>Spiral GitHub Pages</name>
-<!--            <url>github:ssh://shallowinggg.github.io/spiral/</url>-->
-            <url>git:ssh://git@github.com/shallowinggg/spiral.git?gh-pages#</url>
+            <url>github:ssh://shallowinggg.github.io/spiral/</url>
+<!--            <url>git:ssh://git@github.com/shallowinggg/spiral.git?gh-pages#</url>-->
         </site>
     </distributionManagement>
 
@@ -140,31 +140,31 @@
             </plugin>
 
             <!-- move this to parent -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <configuration>
-                    <locales>en,es,ja,fr,zh_CN,ko</locales>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>net.trajano.wagon</groupId>
-                        <artifactId>wagon-git</artifactId>
-                        <version>${wagon-git.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.maven.wagon</groupId>
-                        <artifactId>wagon-ssh</artifactId>
-                        <version>${wagon-ssh.version}</version>
-                    </dependency>
-                    <!-- Additional entries for version site tracking only -->
-                    <dependency>
-                        <groupId>org.apache.maven.skins</groupId>
-                        <artifactId>maven-fluido-skin</artifactId>
-                        <version>${fluido.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-site-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <locales>en,es,ja,fr,zh_CN,ko</locales>-->
+<!--                </configuration>-->
+<!--                <dependencies>-->
+<!--                    <dependency>-->
+<!--                        <groupId>net.trajano.wagon</groupId>-->
+<!--                        <artifactId>wagon-git</artifactId>-->
+<!--                        <version>${wagon-git.version}</version>-->
+<!--                    </dependency>-->
+<!--                    <dependency>-->
+<!--                        <groupId>org.apache.maven.wagon</groupId>-->
+<!--                        <artifactId>wagon-ssh</artifactId>-->
+<!--                        <version>${wagon-ssh.version}</version>-->
+<!--                    </dependency>-->
+<!--                    &lt;!&ndash; Additional entries for version site tracking only &ndash;&gt;-->
+<!--                    <dependency>-->
+<!--                        <groupId>org.apache.maven.skins</groupId>-->
+<!--                        <artifactId>maven-fluido-skin</artifactId>-->
+<!--                        <version>${fluido.version}</version>-->
+<!--                    </dependency>-->
+<!--                </dependencies>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 </project>

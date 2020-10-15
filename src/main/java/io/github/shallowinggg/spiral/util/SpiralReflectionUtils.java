@@ -18,12 +18,13 @@ import static org.springframework.util.ReflectionUtils.findField;
 import static org.springframework.util.ReflectionUtils.getField;
 import static org.springframework.util.ReflectionUtils.makeAccessible;
 
+import javax.annotation.Nullable;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * @author ding shimin

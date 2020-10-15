@@ -1,5 +1,7 @@
 # spiral
 
+[简体中文](https://github.com/shallowinggg/spiral/blob/master/README.zh_CN.md)
+
 [![Build Status](https://travis-ci.com/shallowinggg/spiral.svg?branch=master)](https://travis-ci.com/shallowinggg/spiral)
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![Maven central](https://maven-badges.herokuapp.com/maven-central/io.github.shallowinggg/spiral/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.shallowinggg/spiral)
