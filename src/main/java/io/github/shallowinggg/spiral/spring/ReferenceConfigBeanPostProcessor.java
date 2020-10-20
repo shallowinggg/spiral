@@ -14,11 +14,18 @@
 
 package io.github.shallowinggg.spiral.spring;
 
+import static org.springframework.core.BridgeMethodResolver.findBridgedMethod;
+import static org.springframework.core.BridgeMethodResolver.isVisibilityBridgeMethodPair;
+import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
+import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
+
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.utils.ConcurrentHashSet;
 import com.alibaba.dubbo.config.annotation.Reference;
 import io.github.shallowinggg.spiral.config.SpiralConstant;
 import io.github.shallowinggg.spiral.util.SpiralReflectionUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -38,14 +45,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.springframework.core.BridgeMethodResolver.findBridgedMethod;
-import static org.springframework.core.BridgeMethodResolver.isVisibilityBridgeMethodPair;
-import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
-import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
-
 /**
  * {@link BeanPostProcessor} implementation used to record the load balance for dubbo reference
- * interfaces and replace it with spiral load balance.
+ * interfaces and replace it with spiral load balance. This implementation is used when dubbo
+ * version is higher than {@literal 2.5.6}.
  * <p>
  * When spring context refreshed successfully, the records will be set into system property with the
  * key {@link SpiralConstant#LB_FALLBACK_PROPERTY}. The representation for record is
@@ -62,6 +65,8 @@ import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
  */
 public class ReferenceConfigBeanPostProcessor implements MergedBeanDefinitionPostProcessor,
 		ApplicationListener<ContextRefreshedEvent>, PriorityOrdered {
+
+	private final Log log = LogFactory.getLog(getClass());
 
 	private final StringBuilder lbFallbackBuilder = new StringBuilder();
 
@@ -201,6 +206,9 @@ public class ReferenceConfigBeanPostProcessor implements MergedBeanDefinitionPos
 		// use spiral load balance instead
 		SpiralReflectionUtils.setAnnotationMember(reference, Constants.LOADBALANCE_KEY,
 				SpiralConstant.SPIRAL_LOAD_BALANCE_NAME);
+		if (log.isDebugEnabled()) {
+			log.debug(String.format("Replace load balance for [%s] with spiral", serviceInterface));
+		}
 	}
 
 }

@@ -41,6 +41,9 @@ public class SpiralApplicationConfigRegistrar
 	private static final String REFERENCE_CONFIG_BEAN_PROCESSOR_NAME =
 			"io.github.shallowinggg.spiral.spring.ReferenceConfigBeanPostProcessor";
 
+	private static final String REFERENCE_BEAN_POST_PROCESSOR_NAME =
+			"io.github.shallowinggg.spiral.spring.ReferenceBeanPostProcessor";
+
 	private Environment environment;
 
 	@Override
@@ -55,6 +58,7 @@ public class SpiralApplicationConfigRegistrar
 				|| SystemPropertyUtils.getBoolean(SpiralConstant.ENABLE_PROPERTY, false)) {
 			registerApplicationConfigBeanPostProcessor(beanDefinitionRegistry);
 			registerReferenceConfigBeanPostProcessor(beanDefinitionRegistry);
+			registerReferenceBeanPostProcessor(beanDefinitionRegistry);
 		}
 	}
 
@@ -73,6 +77,15 @@ public class SpiralApplicationConfigRegistrar
 					new RootBeanDefinition(ReferenceConfigBeanPostProcessor.class);
 			beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			registry.registerBeanDefinition(REFERENCE_CONFIG_BEAN_PROCESSOR_NAME, beanDefinition);
+		}
+	}
+
+	private void registerReferenceBeanPostProcessor(BeanDefinitionRegistry registry) {
+		if (!registry.containsBeanDefinition(REFERENCE_BEAN_POST_PROCESSOR_NAME)) {
+			RootBeanDefinition beanDefinition =
+					new RootBeanDefinition(ReferenceBeanPostProcessor.class);
+			beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			registry.registerBeanDefinition(REFERENCE_BEAN_POST_PROCESSOR_NAME, beanDefinition);
 		}
 	}
 
