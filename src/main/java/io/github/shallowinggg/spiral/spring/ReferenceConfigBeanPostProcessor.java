@@ -14,13 +14,7 @@
 
 package io.github.shallowinggg.spiral.spring;
 
-import static org.springframework.core.BridgeMethodResolver.findBridgedMethod;
-import static org.springframework.core.BridgeMethodResolver.isVisibilityBridgeMethodPair;
-import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
-import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
-
 import com.alibaba.dubbo.common.Constants;
-import com.alibaba.dubbo.common.utils.ConcurrentHashSet;
 import com.alibaba.dubbo.config.annotation.Reference;
 import io.github.shallowinggg.spiral.config.SpiralConstant;
 import io.github.shallowinggg.spiral.util.SpiralReflectionUtils;
@@ -42,8 +36,12 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.springframework.core.BridgeMethodResolver.findBridgedMethod;
+import static org.springframework.core.BridgeMethodResolver.isVisibilityBridgeMethodPair;
+import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
+import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 /**
  * {@link BeanPostProcessor} implementation used to record the load balance for dubbo reference
@@ -70,7 +68,7 @@ public class ReferenceConfigBeanPostProcessor implements MergedBeanDefinitionPos
 
 	private final StringBuilder lbFallbackBuilder = new StringBuilder();
 
-	private final Set<String> handledBeans = new ConcurrentHashSet<>(256);
+	private final Map<String, Boolean> handledBeans = new ConcurrentHashMap<>(256);
 
 	/**
 	 * Record whether the service interface has been handled. It assumes that for same service
@@ -122,12 +120,12 @@ public class ReferenceConfigBeanPostProcessor implements MergedBeanDefinitionPos
 		// callers.
 		String cacheKey = StringUtils.hasLength(beanName) ? beanName : clazz.getName();
 		// Quick check on the concurrent map first, with minimal locking.
-		if (!handledBeans.contains(cacheKey)) {
+		if (!handledBeans.containsKey(cacheKey)) {
 			synchronized (handledBeans) {
-				if (!handledBeans.contains(cacheKey)) {
+				if (!handledBeans.containsKey(cacheKey)) {
 					interceptFieldReferenceMetadata(clazz);
 					interceptMethodReferenceMetadata(clazz);
-					handledBeans.add(cacheKey);
+					handledBeans.put(cacheKey, Boolean.TRUE);
 				}
 			}
 		}
