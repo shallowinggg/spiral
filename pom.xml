@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>spiral</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
 
     <name>spiral</name>
@@ -49,14 +49,6 @@
         <developerConnection>scm:git:https://github.com/shallowinggg/spiral.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
-    <distributionManagement>
-        <site>
-            <id>gh-pages</id>
-            <name>Spiral GitHub Pages</name>
-            <url>github:ssh://shallowinggg.github.io/spiral/</url>
-<!--            <url>git:ssh://git@github.com/shallowinggg/spiral.git?gh-pages#</url>-->
-        </site>
-    </distributionManagement>
 
     <properties>
         <clirr.comparisonVersion>0.1.0</clirr.comparisonVersion>
