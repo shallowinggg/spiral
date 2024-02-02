@@ -58,7 +58,7 @@
 
         <dubbo.version>2.2.0</dubbo.version>
         <jsr305.version>3.0.2</jsr305.version>
-        <spring-context.version>3.2.13.RELEASE</spring-context.version>
+        <spring-context.version>5.2.22.RELEASE</spring-context.version>
 
         <mockio-core.version>3.5.13</mockio-core.version>
         <junit.version>4.13.1</junit.version>
